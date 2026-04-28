@@ -107,7 +107,8 @@ ward_fees["total_fee_millions"] = ward_fees["total_fee"] / 1_000_000
 
 fig, ax = plt.subplots(figsize=(11, 6))
 sns.barplot(data=ward_fees, x="total_fee_millions", y="ward",
-            palette="Blues_d", ax=ax, orient="h", order=ward_fees["ward"])
+            hue="ward", palette="Blues_d", ax=ax, orient="h",
+            order=ward_fees["ward"], legend=False)
 ax.set_title("Top 15 Wards by Total Permit Fees Collected (USD Millions)", fontsize=15, pad=14)
 ax.set_xlabel("Total Fees (Millions USD)")
 ax.set_ylabel("Ward")
@@ -122,7 +123,7 @@ processing_clean = df[df["days_to_issue"] <= df["days_to_issue"].quantile(0.95)]
 
 fig, ax = plt.subplots(figsize=(11, 5))
 sns.boxplot(data=processing_clean, x="year", y="days_to_issue",
-            palette="Blues", ax=ax)
+            hue="year", palette="Blues", ax=ax, legend=False)
 ax.set_title("Permit Processing Time Distribution by Year", fontsize=15, pad=14)
 ax.set_xlabel("Year")
 ax.set_ylabel("Days to Issue")
