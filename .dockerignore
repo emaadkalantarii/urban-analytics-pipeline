@@ -1,0 +1,12 @@
+urban-venv/
+__pycache__/
+*.pyc
+.env
+data/raw/
+*.db
+*.sqlite
+.git/
+.ipynb_checkpoints/
+notebooks/
+dashboard/
+docs/
