@@ -107,6 +107,9 @@ Tableau Public
 ### Processing Time Distribution by Year
 ![Processing Time](docs/visualizations/05_processing_time_by_year.png)
 
+### Year-over-Year Permit Volume Change
+![YoY Change](docs/visualizations/06_yoy_permit_change.png)
+
 ---
 
 ## Project Structure

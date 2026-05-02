@@ -96,6 +96,59 @@ plt.savefig(os.path.join(VIZ_DIR, "03_yearly_volume_vs_processing.png"), dpi=150
 plt.close()
 print("Saved 03_yearly_volume_vs_processing.png")
 
+WARD_NAMES = {
+    1: "Wicker Park / Ukrainian Village",
+    2: "Lincoln Park / Old Town",
+    3: "Douglas / Grand Boulevard",
+    4: "Bronzeville / Kenwood",
+    5: "Hyde Park / South Shore",
+    6: "Woodlawn / Chatham",
+    7: "South Shore / Calumet Heights",
+    8: "Chatham / Avalon Park",
+    9: "Roseland / Pullman",
+    10: "East Side / South Deering",
+    11: "Bridgeport / McKinley Park",
+    12: "Bridgeport / Armour Square",
+    13: "Beverly / Morgan Park",
+    14: "Marquette Park / Chicago Lawn",
+    15: "Austin / South Lawndale",
+    16: "Englewood / West Englewood",
+    17: "Englewood / West Englewood",
+    18: "West Lawn / Clearing",
+    19: "Beverly / Mount Greenwood",
+    20: "Woodlawn / Washington Park",
+    21: "Southside / Calumet",
+    22: "Little Village / Pilsen",
+    23: "Midway / Clearing",
+    24: "Austin / Garfield Park",
+    25: "Pilsen / Lower West Side",
+    26: "Humboldt Park / Logan Square",
+    27: "West Town / Ukrainian Village",
+    28: "West Garfield Park / Austin",
+    29: "Austin / West Humboldt Park",
+    30: "Portage Park / Jefferson Park",
+    31: "Belmont Cragin / Portage Park",
+    32: "Bucktown / Logan Square",
+    33: "Avondale / Belmont Gardens",
+    34: "Belmont Cragin / Montclare",
+    35: "Avondale / Irving Park",
+    36: "Dunning / Portage Park",
+    37: "Dunning / Belmont Cragin",
+    38: "Jefferson Park / Norwood Park",
+    39: "Norwood Park / Edison Park",
+    40: "Rogers Park / Edgewater",
+    41: "Edison Park / Norwood Park",
+    42: "The Loop / River North",
+    43: "Lincoln Park / Lakeview",
+    44: "Lakeview / Wrigleyville",
+    45: "Ravenswood / Lincoln Square",
+    46: "Uptown / Edgewater",
+    47: "Roscoe Village / North Center",
+    48: "Rogers Park / West Ridge",
+    49: "Rogers Park / West Ridge",
+    50: "West Ridge / Peterson Park",
+}
+
 ward_fees = (
     df.groupby("ward")["total_fee"]
     .sum()
@@ -104,14 +157,18 @@ ward_fees = (
     .reset_index()
 )
 ward_fees["total_fee_millions"] = ward_fees["total_fee"] / 1_000_000
+ward_fees["ward_int"] = ward_fees["ward"].astype(float).astype("Int64")
+ward_fees["ward_label"] = ward_fees["ward_int"].apply(
+    lambda w: f"Ward {w} — {WARD_NAMES.get(int(w), 'Chicago')}" if pd.notna(w) else "Unknown"
+)
 
-fig, ax = plt.subplots(figsize=(11, 6))
-sns.barplot(data=ward_fees, x="total_fee_millions", y="ward",
-            hue="ward", palette="Blues_d", ax=ax, orient="h",
-            order=ward_fees["ward"], legend=False)
+fig, ax = plt.subplots(figsize=(13, 7))
+sns.barplot(data=ward_fees, x="total_fee_millions", y="ward_label",
+            hue="ward_label", palette="Blues_d", ax=ax, orient="h",
+            order=ward_fees["ward_label"], legend=False)
 ax.set_title("Top 15 Wards by Total Permit Fees Collected (USD Millions)", fontsize=15, pad=14)
 ax.set_xlabel("Total Fees (Millions USD)")
-ax.set_ylabel("Ward")
+ax.set_ylabel("")
 ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"${x:.1f}M"))
 sns.despine()
 plt.tight_layout()
@@ -132,6 +189,30 @@ plt.tight_layout()
 plt.savefig(os.path.join(VIZ_DIR, "05_processing_time_by_year.png"), dpi=150)
 plt.close()
 print("Saved 05_processing_time_by_year.png")
+
+yoy = df.groupby("year").size().reset_index(name="permit_count")
+yoy["pct_change"] = yoy["permit_count"].pct_change() * 100
+yoy = yoy.dropna(subset=["pct_change"])
+yoy["color"] = yoy["pct_change"].apply(lambda x: "#2a6496" if x >= 0 else "#e74c3c")
+yoy["label"] = yoy["pct_change"].apply(lambda x: f"+{x:.1f}%" if x >= 0 else f"{x:.1f}%")
+
+fig, ax = plt.subplots(figsize=(10, 5))
+bars = ax.bar(yoy["year"], yoy["pct_change"], color=yoy["color"], width=0.5, alpha=0.85)
+ax.axhline(0, color="black", linewidth=0.8, linestyle="--")
+for bar, label, val in zip(bars, yoy["label"], yoy["pct_change"]):
+    offset = 0.4 if val >= 0 else -1.2
+    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + offset,
+            label, ha="center", va="bottom", fontsize=11, fontweight="bold",
+            color="#2a6496" if val >= 0 else "#e74c3c")
+ax.set_title("Year-over-Year Change in Permit Volume — Chicago (2019–2023)", fontsize=15, pad=14)
+ax.set_xlabel("Year")
+ax.set_ylabel("% Change vs Previous Year")
+ax.set_xticks(yoy["year"])
+sns.despine()
+plt.tight_layout()
+plt.savefig(os.path.join(VIZ_DIR, "06_yoy_permit_change.png"), dpi=150)
+plt.close()
+print("Saved 06_yoy_permit_change.png")
 
 summary = df.groupby("year").agg(
     total_permits=("id", "count"),
