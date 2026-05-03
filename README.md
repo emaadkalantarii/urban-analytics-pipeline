@@ -6,7 +6,7 @@ End-to-end data analytics pipeline analyzing **833,978 building permit records**
 [![SQL](https://img.shields.io/badge/SQL-SQLite-003B57?style=flat&logo=sqlite&logoColor=white)](https://sqlite.org)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=flat&logo=docker&logoColor=white)](https://docker.com)
 [![Tableau](https://img.shields.io/badge/Tableau-Live%20Dashboard-E97627?style=flat&logo=tableau&logoColor=white)](https://public.tableau.com/app/profile/emad.kalantari/viz/ChicagoUrbanDevelopmentAnalytics/ChicagoUrbanDevelopmentAnalytics20182023)
-[![Power BI](https://img.shields.io/badge/Power%20BI-Dashboard-F2C811?style=flat&logo=powerbi&logoColor=black)](https://github.com/emaadkalantarii/urban-analytics-pipeline)
+[![Power BI](https://img.shields.io/badge/Power%20BI-Dashboard-F2C811?style=flat&logo=powerbi&logoColor=black)](urban_analytics_dashboard.pbix)
 
 ---
 
@@ -14,11 +14,14 @@ End-to-end data analytics pipeline analyzing **833,978 building permit records**
 
 **[View Interactive Tableau Dashboard →](https://public.tableau.com/app/profile/emad.kalantari/viz/ChicagoUrbanDevelopmentAnalytics/ChicagoUrbanDevelopmentAnalytics20182023)**
 
+**[Download Power BI Dashboard (.pbix) →](urban_analytics_dashboard.pbix)**
+> Open in Power BI Desktop to explore the full 3-page interactive dashboard with all data connections and measures intact.
+
 ---
 
 ## Project Overview
 
-A multi-stage data analytics pipeline that ingests, cleans, transforms, and visualizes 833,978 Chicago municipal building permit records. The pipeline covers the full data lifecycle — SQL-based ingestion and cleaning, automated Python ETL with feature engineering, static visualization generation, interactive BI dashboard delivery across two platforms (Tableau and Power BI), and Docker containerization for reproducible execution.
+A multi-stage data analytics pipeline that ingests, cleans, transforms, and visualizes 833,978 Chicago municipal building permit records. The pipeline covers the full data lifecycle — SQL-based ingestion and cleaning, automated Python ETL with feature engineering, static visualization generation, interactive BI dashboard delivery across two platforms (Tableau Public and Power BI), and Docker containerization for reproducible execution.
 
 The pipeline is fully automated: a single Docker command runs all stages end-to-end and writes all outputs to your local machine.
 
@@ -71,10 +74,12 @@ export_dashboard_data.py
     year_month, days_to_issue
         │
         ▼
-Tableau Public                    Power BI Desktop
-  - 4-view interactive dashboard    - 3-page analytical dashboard
-  - Monthly trend · permit types    - Financial analysis · Efficiency
-  - Geo dot map · yearly KPIs       - Executive summary
+Tableau Public                      Power BI Desktop
+  - 4-view interactive dashboard      - 3-page analytical dashboard
+  - Monthly trend · permit types      - Financial analysis
+  - Geo dot map · yearly KPIs         - Operational efficiency
+  - Live public URL                   - Executive summary
+                                      - .pbix file in repo root
 ```
 
 ---
@@ -88,7 +93,8 @@ Tableau Public                    Power BI Desktop
 | Data transformation | SQL | Aggregations, filtering, feature creation |
 | Analysis & automation | Python (Pandas, NumPy) | ETL pipeline, feature engineering |
 | Visualization | Matplotlib, Seaborn | Static chart generation (6 PNGs) |
-| Dashboard | Tableau Public · Power BI | Interactive stakeholder dashboards |
+| BI Dashboard | Tableau Public | Interactive geographic and volume dashboard |
+| BI Dashboard | Power BI Desktop | Financial and operational analytical dashboard |
 | Containerization | Docker, docker-compose | Reproducible single-command execution |
 | Version control | Git, GitHub | Source control and portfolio hosting |
 
@@ -96,89 +102,87 @@ Tableau Public                    Power BI Desktop
 
 ## Python Visualizations
 
-Six static charts generated automatically by `pipeline.py`, saved as high-resolution PNGs to `docs/visualizations/`.
+Six static charts generated automatically by `pipeline.py` and saved as high-resolution PNGs to `docs/visualizations/`.
 
 ---
 
 ### 1 — Monthly Permit Trend (2018–2023)
 ![Monthly Trend](docs/visualizations/01_monthly_trend.png)
 
-A time-series line chart showing monthly permit volume across the full 2018–2023 period. The sharp dip in mid-2020 clearly captures the COVID-19 impact on Chicago's construction activity, followed by a partial recovery in 2021 and a gradual decline through 2023 — telling the most important macro story in the dataset.
+A time-series line chart showing monthly permit volume across the full 2018–2023 period. The sharp dip in mid-2020 clearly captures the COVID-19 impact on Chicago's construction activity, followed by a partial recovery in 2021 and a gradual sustained decline through 2023. This chart tells the most important macro story in the dataset and anchors all downstream analysis.
 
 ---
 
 ### 2 — Top 10 Permit Types by Volume
 ![Permit Types](docs/visualizations/02_permit_types.png)
 
-A horizontal bar chart ranking the 10 most common permit types with exact counts labeled on each bar. Express Permit and Easy Permit programs dominate (~80K each), revealing that the majority of Chicago's permitting activity is routine and fast-tracked rather than major new construction — an insight directly relevant to urban planning resource allocation.
+A horizontal bar chart ranking the 10 most common permit types with exact permit counts labeled on each bar. Express Permit and Easy Permit programs dominate at roughly 80K each, revealing that the majority of Chicago's permitting activity is routine and fast-tracked rather than major new construction — an insight directly relevant to how the city allocates its permitting resources.
 
 ---
 
 ### 3 — Annual Permit Volume vs Average Processing Time
 ![Yearly Overview](docs/visualizations/03_yearly_volume_vs_processing.png)
 
-A dual-axis chart combining blue bars (total permit volume per year) with a red line (average days to issue). The counterintuitive finding is immediately visible: as permit volume declines from 2019 onward, processing time increases — fewer permits being processed yet each one taking longer. This is the most analytically significant chart in the pipeline.
+A dual-axis chart combining blue bars (total permit volume per year) with a red line (average days to issue a permit). The counterintuitive finding is immediately visible: as permit volume declines from 2019 onward, processing time consistently increases — fewer permits being handled yet each one taking longer. This is the most analytically significant chart in the pipeline and the clearest signal of an efficiency problem.
 
 ---
 
 ### 4 — Top 15 Wards by Total Permit Fees Collected
 ![Fees by Ward](docs/visualizations/04_fees_by_ward.png)
 
-A horizontal bar chart showing the top 15 Chicago wards by total fee revenue, with ward labels showing both the ward number and its neighborhood name (e.g. "Ward 42 — The Loop / River North"). This geographic financial breakdown reveals where construction investment is concentrated across the city, making the data meaningful to anyone unfamiliar with ward numbering.
+A horizontal bar chart showing the top 15 Chicago wards by total fee revenue, with labels combining ward numbers and neighborhood names (e.g. "Ward 42 — The Loop / River North"). This geographic financial breakdown reveals where construction investment is concentrated across the city, making the data meaningful to stakeholders unfamiliar with Chicago's ward numbering system.
 
 ---
 
 ### 5 — Permit Processing Time Distribution by Year
 ![Processing Time](docs/visualizations/05_processing_time_by_year.png)
 
-A box plot showing the full distribution of days-to-issue for each year, trimmed at the 95th percentile to remove extreme outliers. Beyond the rising median visible in Chart 3, this chart reveals widening variance from 2020 onward — meaning not only are average times increasing, but the experience is becoming more unpredictable, with some permits taking dramatically longer than others.
+A box plot showing the full statistical distribution of days-to-issue for each year, trimmed at the 95th percentile to remove extreme outliers. Beyond the rising median visible in Chart 3, this chart reveals widening variance from 2020 onward — meaning not only are average processing times increasing, but the experience is becoming more unpredictable, with a growing tail of permits taking dramatically longer than the norm.
 
 ---
 
 ### 6 — Year-over-Year Permit Volume Change
 ![YoY Change](docs/visualizations/06_yoy_permit_change.png)
 
-A diverging bar chart showing the percentage change in permit volume versus the prior year, with positive years in blue and negative years in red. The 2020 drop stands out immediately as the largest single-year decline, while the 2019 and 2021–2023 bars show sustained contraction. This chart makes the trend narrative immediately scannable without requiring any axis reading.
+A diverging bar chart showing the percentage change in permit volume compared to the prior year, with positive years in blue and negative years in red, with exact percentages labeled on each bar. The 2020 drop stands out immediately as the single largest year-on-year decline. This chart makes the trend narrative instantly scannable without requiring any axis reading, and is the most presentation-ready view in the pipeline.
 
 ---
 
 ## Tableau Public Dashboard
 
-Four-view interactive dashboard published at the live URL above. All views are cross-filtered — clicking any permit type in the bar chart updates the trend line and map simultaneously.
+Four-view interactive dashboard published at the live URL above. All views are cross-filtered — clicking any permit type in the bar chart updates the trend line and geographic map simultaneously.
 
----
-
-### Tableau — Full Dashboard View
+### Dashboard Overview
 ![Tableau Dashboard](docs/visualizations/tableau_dashboard.png)
 
-The dashboard combines four complementary views: a monthly trend line (top left) showing the full 2018–2023 volume story, a permit type bar chart (bottom left) showing the structural breakdown, a geographic dot map (bottom center) plotting 238,496 individual permits across Chicago's neighborhoods with color by type, and a multi-measure KPI panel (right) showing annual permit count, average fee, and average processing time on a single combined chart. The cross-filter interactivity allows drilling from city-wide patterns down to individual permit type geographies.
+The dashboard combines four complementary views: a monthly trend line (top left) showing the full 2018–2023 volume story with the 2020 dip clearly visible, a permit type bar chart (bottom left) showing the structural breakdown by type, a geographic dot map (bottom center) plotting 238,496 individual permits across Chicago's neighborhoods colored by permit type, and a multi-measure KPI panel (right) showing annual permit count, average fee, and average processing time together on a single combined chart. The cross-filter interactivity allows drilling from city-wide patterns down to individual permit type geographies in one click.
 
 ---
 
 ## Power BI Dashboard
 
-Three-page analytical dashboard built on the pipeline's processed CSV outputs, designed as a financial and operational complement to the Tableau geographic dashboard. The `.pbix` file is available in the repository root.
+Three-page analytical dashboard built on the pipeline's processed CSV outputs, designed as a financial and operational complement to the Tableau geographic dashboard. The `.pbix` file is available in the repository root and can be opened directly in Power BI Desktop.
 
 ---
 
 ### Page 1 — Financial Analysis
 ![Power BI Financial](docs/visualizations/powerbi_financial.png)
 
-Focuses on fee revenue and construction cost trends. KPI cards surface total fee revenue ($142.48M), average fee ($597), total building fees ($118.36M), and average reported construction cost ($125.92K). The monthly fee revenue line chart shows the 2020 revenue dip and recovery pattern, the permit type bar chart ranks types by total fees generated, and the donut chart breaks down revenue share — revealing that Express Permits alone account for 45.7% of all fee revenue despite being the fastest permit type.
+Focuses on fee revenue and construction cost trends across the 2018–2023 period. Four KPI cards surface total fee revenue ($142.48M), average permit fee ($597), total building fees ($118.36M), and average reported construction cost ($125.92K). The monthly fee revenue line chart shows the 2020 revenue dip and recovery pattern, the permit type bar chart ranks types by total fees generated, the construction cost line chart reveals a sharp cost spike in 2022, and the donut chart breaks down revenue share — showing that Express Permits alone account for 45.7% of all fee revenue. A year slicer allows filtering all visuals to any individual year.
 
 ---
 
 ### Page 2 — Operational Efficiency
 ![Power BI Efficiency](docs/visualizations/powerbi_efficiency.png)
 
-Focuses on processing time, work type distribution, and review pathway analysis. The red column chart shows average processing days rising from 16 (2018) to 26 (2023) — a 44% degradation in efficiency over 6 years. The dual-axis chart combines this with permit volume to make the inverse relationship explicit. The work type bar chart reveals Electrical Work as the dominant category by volume, and the review type pie chart breaks down how permits move through the system — with Express Permit Program (32.5%) and Easy Permit (19.2%) together accounting for over half of all reviews.
+Focuses on processing time degradation, work type distribution, and permit review pathway analysis. The red column chart shows average processing days rising from 16 (2018) to 26 (2023) — a 44% efficiency decline over six years. The dual-axis chart combines volume and processing time to make the inverse relationship explicit at a glance. The work type bar chart reveals Electrical Work as the dominant category by permit volume, and the review type pie chart shows how permits move through the system — Express Permit Program (32.5%) and Easy Permit (19.2%) together account for over half of all reviews. A permit type dropdown slicer filters all visuals on this page.
 
 ---
 
 ### Page 3 — Executive Summary
 ![Power BI Executive](docs/visualizations/powerbi_executive.png)
 
-A single-page stakeholder-ready summary combining five KPI cards, a sortable year-over-year data table, an annual permit volume column chart, and an average fee trend line. The table provides the complete numerical record (2018–2023) with all key metrics in one view — designed for a decision-maker who needs the full picture without drilling into individual pages.
+A single-page stakeholder-ready summary designed for decision-makers who need the complete picture without navigating individual analysis pages. Five KPI cards provide the headline numbers, a sortable year-over-year data table gives the complete numerical record from 2018–2023 across all key metrics, an annual permit volume column chart shows the volume trajectory with data labels, and an average fee trend line shows the fee evolution over time. This page can be screenshotted or exported as a standalone one-page briefing.
 
 ---
 
@@ -199,8 +203,8 @@ urban-analytics-pipeline/
 ├── notebooks/
 │   └── 01_eda.ipynb                # Exploratory data analysis
 ├── docs/
-│   └── visualizations/             # Pipeline output charts + dashboard screenshots
-├── urban_analytics_dashboard.pbix  # Power BI dashboard file
+│   └── visualizations/             # Pipeline charts, Tableau and Power BI screenshots
+├── urban_analytics_dashboard.pbix  # Power BI dashboard — open in Power BI Desktop
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt                # Full local environment
