@@ -1,0 +1,73 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.docker.txt
+
+      - name: Create required directories
+        run: |
+          mkdir -p data/raw
+          mkdir -p data/processed
+          mkdir -p docs/visualizations
+
+      - name: Generate synthetic test dataset
+        run: python scripts/generate_test_data.py
+
+      - name: Run load_to_db.py
+        run: python scripts/load_to_db.py
+
+      - name: Run sql_analysis.py
+        run: python scripts/sql_analysis.py
+
+      - name: Run pipeline.py
+        run: python scripts/pipeline.py
+        env:
+          MPLBACKEND: Agg
+
+      - name: Run export_dashboard_data.py
+        run: python scripts/export_dashboard_data.py
+
+      - name: Verify pipeline outputs
+        run: |
+          echo "Checking database..."
+          test -f data/urban_analytics.db && echo "✓ urban_analytics.db exists"
+
+          echo "Checking processed CSVs..."
+          test -f data/processed/permits_by_type.csv && echo "✓ permits_by_type.csv"
+          test -f data/processed/permits_by_ward_year.csv && echo "✓ permits_by_ward_year.csv"
+          test -f data/processed/monthly_trend.csv && echo "✓ monthly_trend.csv"
+          test -f data/processed/yearly_summary.csv && echo "✓ yearly_summary.csv"
+          test -f data/processed/top_zip_by_fees.csv && echo "✓ top_zip_by_fees.csv"
+          test -f data/processed/permits_by_status.csv && echo "✓ permits_by_status.csv"
+          test -f data/processed/permits_by_work_type.csv && echo "✓ permits_by_work_type.csv"
+          test -f data/processed/permits_by_review_type.csv && echo "✓ permits_by_review_type.csv"
+          test -f data/processed/pipeline_summary.csv && echo "✓ pipeline_summary.csv"
+          test -f data/processed/permits_final.csv && echo "✓ permits_final.csv"
+
+          echo "Checking visualizations..."
+          test -f docs/visualizations/01_monthly_trend.png && echo "✓ 01_monthly_trend.png"
+          test -f docs/visualizations/02_permit_types.png && echo "✓ 02_permit_types.png"
+          test -f docs/visualizations/03_yearly_volume_vs_processing.png && echo "✓ 03_yearly_volume_vs_processing.png"
+          test -f docs/visualizations/04_fees_by_ward.png && echo "✓ 04_fees_by_ward.png"
+          test -f docs/visualizations/05_processing_time_by_year.png && echo "✓ 05_processing_time_by_year.png"
+          test -f docs/visualizations/06_yoy_permit_change.png && echo "✓ 06_yoy_permit_change.png"
+
+          echo "All pipeline outputs verified successfully."
